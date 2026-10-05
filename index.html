@@ -1,9 +1,12 @@
+html
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Materiais</title>
+  <title>Sistema de Requisição de Materiais Elétricos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg-color: #0f2228;
@@ -16,758 +19,687 @@
       --danger: #ff4444;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Courier New', Courier, monospace, sans-serif;
-      user-select: none;
-    }
-
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      color: var(--white);
     }
 
-    .container {
-      width: 100%;
-      max-width: 650px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+    /* Smooth Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
-
-    header {
-      background-color: var(--card-bg);
-      border: 2px solid var(--purple-neon);
-      border-radius: 8px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 0 10px rgba(128, 0, 255, 0.3);
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 10px;
+    ::-webkit-scrollbar-track {
       background: var(--bg-color);
-      border: 1px solid var(--purple-neon);
-      color: var(--green-neon);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1c3c44;
       border-radius: 4px;
-      font-size: 1rem;
-      outline: none;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--green-neon);
     }
 
-    .search-box::placeholder {
-      color: #00ff6688;
+    .neon-border-green {
+      border-color: var(--green-neon) !important;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
     }
 
-    .actions-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      border: 2px solid var(--purple-neon);
-      padding: 10px 15px;
-      border-radius: 8px;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .counter-info {
-      font-weight: bold;
-      font-size: 0.95rem;
-    }
-
-    .btn {
-      background: var(--item-bg);
-      color: var(--green-neon);
-      border: 1px solid var(--purple-neon);
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s;
-    }
-
-    .btn:hover {
-      background: var(--purple-neon);
-      color: var(--white);
-      box-shadow: 0 0 8px var(--purple-neon);
-    }
-
-    .btn-copy {
-      background: var(--purple-neon);
-      color: var(--white);
-    }
-
-    .btn-copy:hover {
-      background: #9933ff;
-    }
-
-    .table-container {
+    .custom-card {
       background-color: var(--card-bg);
-      border: 2px solid var(--purple-neon);
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 65vh;
-      overflow-y: auto;
+      border: 1px solid #1c3c44;
     }
 
-    .list-header {
-      display: grid;
-      grid-template-columns: 100px 1fr 100px;
-      gap: 10px;
-      padding: 10px 15px;
-      font-weight: bold;
-      border-bottom: 2px solid var(--purple-neon);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-    }
-
-    .material-item {
-      display: grid;
-      grid-template-columns: 100px 1fr 100px;
-      gap: 10px;
-      align-items: center;
+    .custom-item-bg {
       background-color: var(--item-bg);
-      border: 1px solid var(--purple-neon);
-      border-radius: 6px;
-      padding: 8px 15px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
     }
 
-    .material-item:hover {
-      border-color: var(--green-neon);
-    }
-
-    .material-item.selected {
-      background-color: #2b124c;
-      border: 2px solid var(--green-neon);
-      box-shadow: inset 0 0 5px var(--green-neon);
-    }
-
-    .code {
-      font-weight: bold;
-      font-size: 0.95rem;
-    }
-
-    .name {
-      font-size: 0.85rem;
-      color: var(--white);
-      word-break: break-word;
-    }
-
-    .qty-control {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 4px;
-    }
-
-    .btn-qty {
-      width: 26px;
-      height: 26px;
-      background: var(--bg-color);
+    .text-neon-green {
       color: var(--green-neon);
-      border: 1px solid var(--purple-neon);
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .btn-qty:hover {
-      background: var(--purple-neon);
-      color: var(--white);
-    }
-
-    .qty-input {
-      width: 38px;
-      height: 26px;
-      background: var(--bg-color);
-      border: 1px solid var(--purple-neon);
-      color: var(--green-neon);
-      text-align: center;
-      border-radius: 4px;
-      font-weight: bold;
-      outline: none;
-    }
-
-    /* Modal Pop-up */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--card-bg);
-      border: 2px solid var(--purple-neon);
-      border-radius: 8px;
-      width: 90%;
-      max-width: 450px;
-      padding: 20px;
-      box-shadow: 0 0 20px var(--purple-neon);
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .modal-title {
-      font-size: 1.1rem;
-      text-align: center;
-    }
-
-    .modal-content {
-      background: var(--bg-color);
-      border: 1px solid var(--purple-neon);
-      padding: 12px;
-      max-height: 250px;
-      overflow-y: auto;
-      font-size: 0.95rem;
-      white-space: pre-wrap;
-      color: var(--white);
-      border-radius: 4px;
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: space-around;
-      gap: 15px;
-    }
-
-    .btn-modal {
-      flex: 1;
-      padding: 10px;
-      font-size: 0.95rem;
-    }
-
-    .btn-no {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    .btn-no:hover {
-      background: var(--danger);
-      color: var(--white);
-      box-shadow: 0 0 8px var(--danger);
+    .bg-neon-green {
+      background-color: var(--green-neon);
     }
   </style>
 </head>
-<body>
+<body class="h-screen w-screen flex flex-col font-sans antialiased overflow-hidden">
 
-  <div class="container">
-    <header>
-      <h1>LISTA DE MATERIAIS</h1>
-      <input type="text" id="searchInput" class="search-box" placeholder="Pesquisar por Código ou Nome...">
-    </header>
-
-    <div class="actions-bar">
-      <div class="counter-info">
-        Selecionados: <span id="selectedCount">0</span>
+  <!-- Header (Fixed Top) -->
+  <header class="h-16 border-b border-[#1c3c44] bg-[#132a30] px-4 lg:px-8 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00ff66] to-[#8000ff] flex items-center justify-center text-[#0f2228] text-xl font-bold shadow-lg">
+        <i class="fa-solid fa-bolt"></i>
       </div>
       <div>
-        <button id="btnClear" class="btn">Limpar Seleção</button>
-        <button id="btnCopyTrigger" class="btn btn-copy">Copiar Seleção</button>
+        <h1 class="text-base sm:text-lg font-bold tracking-wide text-white flex items-center gap-2">
+          REQUISITOR DE MATERIAIS
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">Almoxarifado & Materiais de Distribuição</p>
       </div>
     </div>
 
-    <div class="table-container">
-      <div class="list-header">
-        <div>Código</div>
-        <div>Descrição</div>
-        <div style="text-align: right;">QTD</div>
+    <!-- Quick Stats & Mobile Toggle -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4 px-3 py-1.5 custom-card rounded-lg text-xs">
+        <div>
+          <span class="text-slate-400">Total:</span>
+          <span class="font-mono font-bold text-white ml-1" id="statTotalItems">0</span>
+        </div>
+        <div class="h-4 w-px bg-[#1c3c44]"></div>
+        <div>
+          <span class="text-slate-400">Selecionados:</span>
+          <span class="font-mono font-bold text-neon-green ml-1" id="statSelected">0</span>
+        </div>
       </div>
-      <div id="materialsList"></div>
+
+      <button id="openAddItemModalBtn" class="px-3 py-1.5 bg-neon-green text-[#0f2228] font-bold text-xs rounded-lg hover:brightness-110 flex items-center gap-1.5 transition-all">
+        <i class="fa-solid fa-plus"></i>
+        <span class="hidden sm:inline">Novo Item</span>
+      </button>
+
+      <button id="toggleMobileCartBtn" class="lg:hidden relative p-2 bg-[#193339] text-neon-green border border-neon-green/30 rounded-lg">
+        <i class="fa-solid fa-clipboard-list text-lg"></i>
+        <span id="mobileBadge" class="absolute -top-1 -right-1 bg-neon-green text-[#0f2228] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main View Area (Flex Layout filling remaining vertical space) -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- Primary Content Area -->
+    <main class="flex-1 flex flex-col h-full min-w-0 bg-[#0f2228]">
+      
+      <!-- Sticky Toolbar -->
+      <div class="p-4 border-b border-[#1c3c44] bg-[#132a30]/80 backdrop-blur-md flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between shrink-0 z-10">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por código ou descrição..." 
+            class="w-full pl-10 pr-10 py-2 custom-item-bg border border-[#1c3c44] rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00ff66] transition-all">
+          <button id="clearSearchBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm hidden">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Toolbar Actions -->
+        <div class="flex items-center justify-between sm:justify-end gap-2">
+          <!-- View Toggle -->
+          <div class="custom-card rounded-lg p-1 flex items-center gap-1">
+            <button id="viewGridBtn" class="px-3 py-1.5 rounded text-xs font-medium transition-all bg-[#00ff66]/20 text-neon-green border border-neon-green/30 flex items-center gap-1.5">
+              <i class="fa-solid fa-grip"></i>
+              <span class="hidden md:inline">Cards</span>
+            </button>
+            <button id="viewTableBtn" class="px-3 py-1.5 rounded text-xs font-medium transition-all text-slate-300 hover:text-white flex items-center gap-1.5">
+              <i class="fa-solid fa-list-ul"></i>
+              <span class="hidden md:inline">Tabela</span>
+            </button>
+          </div>
+
+          <button id="unselectAllBtn" class="px-3 py-2 custom-card hover:bg-[#193339] text-slate-300 hover:text-white text-xs rounded-lg transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Limpar Seleção</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE LIST CONTAINER (Fixes Scrolling) -->
+      <div class="flex-1 overflow-y-auto p-4 lg:p-6 min-h-0" id="itemsContainerWrapper">
+        <div id="itemsContainer">
+          <!-- Dynamically populated materials -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar / Requisition Panel -->
+    <aside id="sidebarPanel" class="w-full sm:w-96 border-l border-[#1c3c44] bg-[#132a30] flex flex-col h-full fixed lg:relative right-0 top-0 z-30 transition-transform duration-300 transform translate-x-full lg:translate-x-0">
+      
+      <!-- Panel Header -->
+      <div class="p-4 border-b border-[#1c3c44] flex items-center justify-between shrink-0 bg-[#0f2228]">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-neon-green"></i>
+          <h2 class="font-bold text-white text-sm tracking-wide">RESUMO DA REQUISIÇÃO</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="selectedBadgeCount" class="bg-[#00ff66]/10 border border-[#00ff66]/30 text-neon-green text-xs font-bold px-2 py-0.5 rounded-full">
+            0 selecionado(s)
+          </span>
+          <button id="closeMobileCartBtn" class="lg:hidden text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Requisition Items -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-2 min-h-0" id="selectedItemsList">
+        <div id="emptyCartState" class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+          <div class="w-16 h-16 rounded-full custom-item-bg border border-[#1c3c44] flex items-center justify-center text-2xl mb-3 text-slate-500">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <p class="text-sm font-medium text-slate-200 mb-1">Nenhum item selecionado</p>
+          <p class="text-xs text-slate-400">Clique nos itens para adicionar à requisição.</p>
+        </div>
+      </div>
+
+      <!-- Panel Footer & Copy Action -->
+      <div class="p-4 border-t border-[#1c3c44] bg-[#0f2228] shrink-0 space-y-3">
+        <div class="custom-item-bg border border-[#1c3c44] rounded-lg p-3 text-xs text-slate-300 space-y-1">
+          <div class="flex justify-between">
+            <span>Formato de saída:</span>
+            <span class="font-mono text-neon-green font-semibold">&lt;CÓDIGO&gt; QTD &lt;QUANTIDADE&gt;</span>
+          </div>
+        </div>
+
+        <button id="copyRequisitionBtn" disabled class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700 flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-copy"></i>
+          <span>COPIAR (CÓDIGO + QTD)</span>
+        </button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Modal: Add New Custom Item -->
+  <div id="addItemModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="custom-card rounded-2xl w-full max-w-md p-6 border border-[#1c3c44] shadow-2xl relative">
+      <div class="flex justify-between items-center mb-4 border-b border-[#1c3c44] pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-box-plus text-neon-green"></i> Adicionar Novo Material
+        </h3>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="addItemForm" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-300 font-medium mb-1">Código do Material</label>
+          <input type="text" id="newCodeInput" required placeholder="Ex: 30059999"
+            class="w-full py-2 px-3 custom-item-bg border border-[#1c3c44] rounded-lg text-sm text-white focus:outline-none focus:border-neon-green font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-medium mb-1">Descrição / Nome do Material</label>
+          <input type="text" id="newNameInput" required placeholder="Ex: CABO ISOLADO 10MM GRUPO A"
+            class="w-full py-2 px-3 custom-item-bg border border-[#1c3c44] rounded-lg text-sm text-white focus:outline-none focus:border-neon-green">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-medium mb-1">Quantidade Inicial</label>
+          <input type="number" id="newQtyInput" min="1" value="1" required
+            class="w-full py-2 px-3 custom-item-bg border border-[#1c3c44] rounded-lg text-sm text-white focus:outline-none focus:border-neon-green font-mono">
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" id="cancelModalBtn" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-[#193339] text-slate-300 hover:text-white">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-neon-green text-[#0f2228] hover:brightness-110">
+            Salvar Item
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Modal de Confirmação -->
-  <div id="modalOverlay" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-title">Deseja copiar os itens selecionados?</div>
-      <div id="modalPreview" class="modal-content"></div>
-      <div class="modal-actions">
-        <button id="btnConfirmCopy" class="btn btn-modal btn-copy">SIM (Copiar)</button>
-        <button id="btnCancelCopy" class="btn btn-modal btn-no">NÃO</button>
-      </div>
+  <!-- Toast Notification Overlay -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#132a30] border border-[#00ff66] text-neon-green px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+    <div class="w-8 h-8 rounded-lg bg-[#00ff66]/20 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-check text-neon-green"></i>
+    </div>
+    <div>
+      <h4 class="text-xs font-bold text-white">Notificação</h4>
+      <p class="text-[11px] text-slate-300" id="toastMessage">Ação realizada com sucesso.</p>
     </div>
   </div>
 
+  <!-- Application Logic -->
   <script>
     const rawData = [
       ["30050021", "ABRACADEIRA FLEX PT 390MM 7,8MM 100MM"],
-["30050022", "ABRACADEIRA FLEX PT 950MM 8,8MM 250MM"],
-["30051093", "ABRACADEIRA ID GUARD TEC EL VELC VD"],
-["30050117", "AFASTADOR ARM SEC AC 1010/20 900MM"],
-["30050149", "ALCA PREF DISTR CA 336,4MCM"],
-["30050153", "ALCA PREF DISTR CA CAA 3/0AWG"],
-["30050155", "ALCA PREF DISTR CA CAA 4AWG"],
-["30050159", "ALCA PREF DISTR CABO PROT 15KV 185MM2"],
-["30050164", "ALCA PREF DISTR CORDOALHA AC 6,4MM"],
-["30050166", "ALCA PREF DISTR PROT 15KV 70MM2"],
-["30050172", "ALCA PREF SERV CABO MULT 70MM2"],
-["30050173", "ALCA PREF SERV CABO MULT NI 10A16MM2"],
-["30050290", "ANEL AMAR ESPACAD SEPARAD PEAD CZ"],
-["30050330", "ANILHA PVC NUMERO 6 9A12,6MM"],
-["30050331", "ANILHA PVC NUMERO CINCO 9A12,6MM"],
-["30050332", "ANILHA PVC NUMERO DOIS 9A12,6MM"],
-["30050333", "ANILHA PVC NUMERO NOVE 9A12,6MM"],
-["30050334", "ANILHA PVC NUMERO OITO 9A12,6MM"],
-["30050335", "ANILHA PVC NUMERO QUATRO 9A12,6MM"],
-["30050336", "ANILHA PVC NUMERO SETE 9A12,6MM"],
-["30050337", "ANILHA PVC NUMERO TRES 9A12,6MM"],
-["30050338", "ANILHA PVC NUMERO UM 9A12,6MM"],
-["30050339", "ANILHA PVC NUMERO ZERO 9A12,6MM"],
-["30050361", "APITO TP C/CORDAO GUARD"],
-["30050393", "ARMACAO P/ISOL SEC 1 ESTR DES: AMR-060"],
-["30050394", "ARMACAO P/ISOL SEC AC 1010 1020 2 ESTR"],
-["30050463", "ARRUELA LISA QUAD ACO CARB 18MM 3MM"],
-["30050515", "BANDEIRA SINAL S/CABO EDP"],
-["30050725", "BLINDAGEM COMPLETA SEC TRAFO DIST TRI"],
-["30050777", "BLOQUEADOR SOLAR FPS 30 FR 120G 68"],
-["30059253", "BLOQUEADOR SOLAR FPS 60 BIS 120G 70"],
-["30050947", "BOLSA TRANSP P/CAPACETE VISEIRA"],
-["30050945", "BOLSA TRANSP P/LUVA ISOL"],
-["30050951", "BOLSA TRANSP P/LV MAN ISL"],
-["30051100", "BRACO C AC 13,8KV"],
-["30051106", "BRACO L FOFO NOD 15KV"],
-["10050583", "CABO ANTIF AL 1X1X16MM2+16MM2 0,6-1KV"],
-["30051481", "CABO FLEX CU EL PVC 2C 2,5MM2 500V PT"],
-["30051554", "CABO ISOL PVC CU PVC PT 37C 120MM2 750V"],
-["10050547", "CABO MULT QDX NI AL XLPE 3X120+70MM2 1KV"],
-["10050549", "CABO MULT QDX NI AL XLPE 3X16+16MM2 1KV"],
-["10050551", "CABO MULT QDX NI AL XLPE 3X25+25MM2 1KV"],
-["10050553", "CABO MULT QDX NI AL XLPE 3X70+70MM2 1KV"],
-["10050544", "CABO MULT TPX NI AL XLPE 2X16+16MM2 1KV"],
-["10050866", "CABO NU AC AL 50,29MM2 3F 9,93MM"],
-["10051206", "CABO NU AL 4AWG SWAN"],
-["10050870", "CABO NU CA AL 1/0AWG 9,36MM 7F 3,12MM"],
-["10050875", "CABO NU CA AL 336,4MCM 19F TULIP"],
-["10050879", "CABO NU CA AL 84,91MM2 7F 3,93MM"],
-["10051202", "CABO NU CAA AL 1/0AWG RAVEN"],
-["10051016", "CABO POT CU EL EPR 1C 120MM2 1KV PT"],
-["10050570", "CABO PROT AL PE RET 1C 185MM2 15KV CZ"],
-["30051709", "CABO PROT CU 1C 16MM2 15KV CZ"],
-["10050572", "CABO PROT XLPE AL PE RET 1C 70MM2 15KV"],
-["30051751", "CABO WPP CU 50MM2 CZ"],
-["30054644", "CAIXA MED ENER P/TCS MEDIC 460MM 140MM"],
-["30054645", "CAIXA MED ENER S/ABER 300MM 200MM"],
-["30052378", "CAIXA ORGANIZADORA PP 130 L PRETO PITLOG"],
-["30051966", "CALCA SEG MOTOSSERRISTA T:G"],
-["30051967", "CALCA SEG MOTOSSERRISTA T:GG"],
-["30051968", "CALCA SEG MOTOSSERRISTA T:M"],
-["30051969", "CALCA SEG MOTOSSERRISTA T:P"],
-["30051943", "CALCA SEG OP ANTI T:EG"],
-["30051937", "CALCA SEG OP ANTI T:EGG"],
-["30051938", "CALCA SEG OP ANTI T:EGGG"],
-["30051940", "CALCA SEG OP ANTI T:GG"],
-["30051941", "CALCA SEG OP ANTI T:M"],
-["30051942", "CALCA SEG OP ANTI T:P"],
-["30051063", "CALCADO SEG BOTIN 38"],
-["30052046", "CALCADO SEG BOTIN 38"],
-["30051064", "CALCADO SEG BOTIN 39"],
-["30052047", "CALCADO SEG BOTIN 39"],
-["30052048", "CALCADO SEG BOTIN 40"],
-["30052050", "CALCADO SEG BOTIN 42"],
-["30052051", "CALCADO SEG BOTIN 43"],
-["30052052", "CALCADO SEG BOTIN 44"],
-["30052053", "CALCADO SEG BOTIN 45"],
-["30051052", "CALCADO SEG BOTIN CL ELET 38"],
-["30051053", "CALCADO SEG BOTIN CL ELET 39"],
-["30051054", "CALCADO SEG BOTIN CL ELET 40"],
-["30051055", "CALCADO SEG BOTIN CL ELET 41"],
-["30051058", "CALCADO SEG BOTIN CL ELET 44"],
-["30052062", "CALCADO SEG BOTIN ELETRIC 37"],
-["30052065", "CALCADO SEG BOTIN ELETRIC COUR CUR CR 36"],
-["30051067", "CALCADO SEG COT ELET 42"],
-["30051068", "CALCADO SEG COT ELET 43"],
-["30051069", "CALCADO SEG COT ELET 45"],
-["30052090", "CALCO AJUS AC 1020 138MM"],
-["30052244", "CAMISA OP ANT MASC G."],
-["30052237", "CAMISA OP ANTI FEM G"],
-["30052238", "CAMISA OP ANTI FEM GG"],
-["30052239", "CAMISA OP ANTI FEM M"],
-["30052240", "CAMISA OP ANTI FEM P"],
-["30052246", "CAMISA OP ANTI M"],
-["30052243", "CAMISA OP ANTI MASC EGG"],
-["30052247", "CAMISA OP ANTI P"],
-["30052245", "CAMISA OPERACIONAL ANTI CHAMA GG"],
-["30052248", "CAMISA OPERACIONAL ANTI CHAMA TAM XG"],
-["30052331", "CAMISETA ALG 100PCT G"],
-["30052330", "CAMISETA ALGO 100PCT CAR EGG"],
-["30052332", "CAMISETA ALGO 100PCT CAR GG"],
-["30052333", "CAMISETA ALGO 100PCT CAR M"],
-["30052334", "CAMISETA ALGO 100PCT CAR P"],
-["30052356", "CAMISETA MALH ANTI-CHAM G"],
-["30052357", "CAMISETA MALH ANTI-CHAM GG"],
-["30052358", "CAMISETA MALH ANTI-CHAM M"],
-["30052359", "CAMISETA MALH ANTI-CHAM P"],
-["30052360", "CAMISETA MALH ANTI-CHAM XG"],
-["30052558", "CANTONEIRA SUPORTE AUX RDC ACO CARB"],
-["30052624", "CAPACETE SEG C/ABA FRON LJ"],
-["30052623", "CAPACETE SEGURANCA C/ABA FRON BR"],
-["30052657", "CARNEIRA C/JUG CAP SEGURANCA STAN ON"],
-["30052658", "CARNEIRA C/JUG FAZ-TRAC CAP SEGURANCA"],
-["30052957", "CHAVE CALIBR 10P 600V CA 20A C/TOM"],
-["10051358", "CHAVE FUS RELIG 15KV 100A MANUAL"],
-["10051364", "CHAVE FUSIVEL 36,2KV 300A MANUAL"],
-["10051426", "CHAVE SEC BYP 15KV 630A MANUAL D-E"],
-["10051424", "CHAVE SEC BYP 15KV 630A MANUAL E-D"],
-["10051443", "CHAVE SEC FACA 15KV 630A POLIM"],
-["30053134", "CINTA POSTE AC ZC F 160MM B-16"],
-["30053136", "CINTA POSTE AC ZC F 180MM B-18"],
-["30053137", "CINTA POSTE AC ZC F 200MM B-20"],
-["30053138", "CINTA POSTE AC ZC F 220MM B-22"],
-["30053140", "CINTA POSTE AC ZC F 240MM B-24"],
-["30053141", "CINTA POSTE AC ZC F 260MM B-26"],
-["30053241", "CINTO P/CALCA PA"],
-["30053250", "CINTO SEG PARAQUEDISTA T2 LEAL"],
-["30053252", "CINTO SEGUR PARAQ LV CEST AEREA T:1"],
-["30053253", "CINTO SEGUR PARAQ LV CEST AEREA T:2"],
-["30053255", "CINTO SEGUR PRQ T:1 LEAL"],
-["30053274", "CJ EMENDA CABO CONCENTRICO XLPE"],
-["30053280", "CJ IMPERMEAVEL EXG"],
-["30053281", "CJ IMPERMEAVEL G"],
-["30053282", "CJ IMPERMEAVEL GG"],
-["30053283", "CJ IMPERMEAVEL M"],
-["30053284", "CJ IMPERMEAVEL P"],
-["30053317", "COBERTURA PROT ESTRIBO/GLV 15KV"],
-["30053319", "COBERTURA PROT PARA-RAIO 13,8KV"],
-["30053409", "COLETE SINAL C/REFL G"],
-["30053408", "COLETE SINAL EG"],
-["30053410", "COLETE SINAL GG"],
-["30053411", "COLETE SINAL M"],
-["30053432", "CON CNH RM III-IV-V CU 1,5A21,15MM2"],
-["30053435", "CON CUNHA RAMAL I CU 8,36A35MM2"],
-["30053436", "CON CUNHA RAMAL VII CU 21,15A70MM2"],
-["30053437", "CON CUNHA RD CN2 AL PROT CORR GAL"],
-["30053439", "CON CUNHA RD CN4 AL PROT CORR GAL"],
-["30053444", "CON CUNHA RD CN6 AL PROT CORR GAL"],
-["30053445", "CON CUNHA RD CN7 AL PROT CORR GAL"],
-["30054024", "CON TERM COMPR 240MM2"],
-["10051773", "CONCENTR PRIM ENERG 3F RED CEL LANDIS"],
-["10051778", "CONCENTR SEC ENERG 3F 120/240V"],
-["10051781", "CONCENTR SEC ENERG 3F RF"],
-["30053479", "CONE SINAL PVC 750MM C/FX REFL"],
-["30053521", "CONECT CUNH RAMAL TP II CU 13,3A35MM2"],
-["30053522", "CONECT CUNH RAMAL TP VI CU 33,63A70MM2"],
-["30053529", "CONECT ESTRAN TP 5 LG AL 95A120MM2"],
-["30053531", "CONECT ESTRAN TP 7 LG AL 185A240MM2"],
-["30053533", "CONECT ESTRANG TP 4 LG AL 62,44A70MM2"],
-["30053534", "CONECT LUV COMPRES AL"],
-["30053535", "CONECT LUV COMPRES CU ELETROL 27A27,2MM"],
-["30053933", "CONECTOR PERF ESP HIBR 4-4/0AWG"],
-["30053934", "CONECTOR PERF ESP HIBR 4-4/0AWG"],
-["30053937", "CONECTOR PERF FLEX 10-25MM2 16-25MM2"],
-["30053936", "CONECTOR PERF FLEX 10A16MM2 6A12MM2"],
-["30053938", "CONECTOR PERF FLEX 10A35MM2 25A35MM2"],
-["30053939", "CONECTOR PERF FLEX 25A70MM2 50A70MM2"],
-["30053940", "CONECTOR PERF FLEX 50A120MM2 185A240MM2"],
-["30053941", "CONECTOR PERF FLEX 95A120MM2 95A120MM2"],
-["30053944", "CONECTOR PERF RD 16-120MM2 4-35MM2"],
-["30053945", "CONECTOR PERF RD 16-95MM2 1,5-10MM2"],
-["30053946", "CONECTOR PERF RD 25-120MM2 25-120MM2"],
-["30054479", "CORDA SEG LINHA VIDA"],
-["30054529", "CPU CONCENTR SEC 80A300V 1A18V"],
-["30054528", "CPU CONCENTR SECUND 120V 15-100A 60HZ"],
-["30054577", "CRUZETA P/POSTE AC 1010/20 2M"],
-["30054579", "CRUZETA P/POSTE FB VD 2M 90MM 90MM"],
-["30054583", "CRUZETA P/POSTE FB VD 3,92M 90X90MM"],
-["30054636", "CX INTERLIG P/REDE CONCENTR"],
-["30054746", "DISJ MINI TM 63A 2P"],
-["30054777", "DISJUNTOR BT TERMOM BIP 50A 220/380VCA"],
-["30054779", "DISJUNTOR BT TERMOM BIP 70A 220/380VCA"],
-["30054792", "DISJUNTOR MINI 1P 50A 220V"],
-["30054793", "DISJUNTOR MINI 1P 63A 440V 250V"],
-["30054794", "DISJUNTOR MINI 1P 70A 440V"],
-["30054842", "DISPLAY TERMINAL LEITURA TLI LANDIS"],
-["30054942", "ELETRODUTO FLEX CORR AC 1POL"],
-["30055007", "ELO FUSIVEL H 1A 500MM"],
-["30055008", "ELO FUSIVEL H 2A 500MM"],
-["30055009", "ELO FUSIVEL H 3A 500MM"],
-["30055010", "ELO FUSIVEL H 5A 500MM"],
-["30055011", "ELO FUSIVEL K 10A 500MM"],
-["30055012", "ELO FUSIVEL K 12A 500MM"],
-["30055013", "ELO FUSIVEL K 15A 500MM"],
-["30055014", "ELO FUSIVEL K 20A 500MM"],
-["30055016", "ELO FUSIVEL K 25A 500MM"],
-["30055017", "ELO FUSIVEL K 30A 500MM"],
-["30055018", "ELO FUSIVEL K 40A 500MM"],
-["30055019", "ELO FUSIVEL K 50A 500MM"],
-["30055020", "ELO FUSIVEL K 65A 500MM"],
-["30055021", "ELO FUSIVEL K 6A 500MM"],
-["30055023", "ELO FUSIVEL K 8A 500MM"],
-["30055032", "EMENDA ELET AUT 14,73A18,39MM"],
-["30055034", "EMENDA ELET AUT 5,82A8,64MM"],
-["30055036", "EMENDA ELET AUT 9,27A12,07MM"],
-["30055078", "EMENDA TERMOCONT FR 8,7-15KV 240MM2"],
-["30055136", "ENVELOPE PE 400MM 484MM"],
-["30055224", "ESPACADOR AUT LOSANG 13,8KV"],
-["30055238", "ESPACADOR P/REDE AEREA SEC 1/0A336,4AWG"],
-["30055318", "ESTOJO P/OCULOS SEG"],
-["30055321", "ESTRIBO DERIV CU ESTANHADO E MP-07-02"],
-["30055741", "FIO AMARRACAO 4AWG AL"],
-["30055703", "FIO ISOL AL XPLE PT 1C 10MM2 600V"],
-["30055743", "FITA ANCOR SLI 1,2M"],
-["30055746", "FITA ANCOR TUB 1,2M"],
-["30055747", "FITA ANCOR TUB 1,5M"],
-["30055748", "FITA ANCOR TUB 600MM"],
-["30055749", "FITA ANCOR TUB 800MM"],
-["30055808", "FITA DEMARC REF SINAL CANT"],
-["30055806", "FITA DEMARC REF SINAL CANT C/CARRET"],
-["30055789", "FITA ISOL ADES PT 19MM RL 20M"],
-["30055854", "FONTE ALIMENT 90A240V 7,5W"],
-["30055937", "FORMULARIO COMUM NAO CONFORMID NUC 50X2V"],
-["30055940", "FORMULARIO CONFEC LIUC BT IND MT 50X2VIA"],
-["30055949", "FORMULARIO LEVANTAM CARGA INSTAL LEC50X2"],
-["30055954", "FORMULARIO TERMO OCORR INSP 210MM 297MM"],
-["30056018", "FREIO DESCENSOR EDDY AUTOBLOCANTE"],
-["30056131", "GANCHO SUST P/CAB ANT-FURT CONC 11,6MM"],
-["30056254", "GRAMPO P/ISOL T-1 AC 1020"],
-["30056366", "HASTE AT SIMPL AC 1020 COBR 5/8POL 2,4M"],
-["30056458", "ISOL ELET PILAR PORCEL 15KV 1000DAN"],
-["30056462", "ISOL ELET ROLD PORCEL VID"],
-["30056490", "ISOLADOR ELET PILAR AUTOTRAV POLIM 15KV"],
-["30056455", "ISOLADOR ELETR BAST POLIM 15KV"],
-["30056487", "ISOLADOR ELETR CAST PORCEL 25KV 600V"],
-["30056578", "JAQUETA OP ANTI EG 33"],
-["30056574", "JAQUETA OP ANTI G 33"],
-["30056575", "JAQUETA OP ANTI GG 33"],
-["30056576", "JAQUETA OP ANTI M 33"],
-["30056577", "JAQUETA OP ANTI P 33"],
-["30056637", "KIT ACESS PRESILHA ALCA"],
-["30056651", "KIT CHICOTE MED INDIRETA BT 1,8M"],
-["30056758", "KIT PROT FAC"],
-["30056767", "KIT REPARO CONE SINALIZACAO"],
-["30056851", "LACO PREF LAT DP CA CAA NU 1/0AWG"],
-["30056853", "LACO PREF LAT DP CA CAA NU 336,4MCM"],
-["30056856", "LACO PREF ROLD CA NU 1/0AWG"],
-["30056858", "LACO PREF ROLD CA NU 3/0AWG"],
-["30056859", "LACO PREF ROLD CA NU 336,4MCM"],
-["30056866", "LACO PREF TOPO CA CAA NU 336,4MCM"],
-["30056883", "LACRE PC AZ EDP 130MM"],
-["30060049", "LACRE PC VM"],
-["30056893", "LAMINA DESLIG LIGA CO BZ 15KV 300A 285MM"],
-["30057009", "LANTERNA CAB P/CAP ELAST"],
-["30057223", "LUVA COB LUVA ISOL COUR VAQ T:8"],
-["30057224", "LUVA COB LUVA ISOL COUR VAQ T:8,5"],
-["30057221", "LUVA COB LUVA ISOL T:10"],
-["30057222", "LUVA COB LUVA ISOL T:10,5"],
-["30057225", "LUVA COB LUVA ISOL T:9"],
-["30057226", "LUVA COB LUVA ISOL T:9,5"],
-["30057271", "LUVA EMENDA CABO COMPR LG AL ASTM 1100 1"],
-["30057279", "LUVA EMENDA CB COMPR AL 21,15MM2"],
-["30057280", "LUVA EMENDA CB COMPR AL 53,47MM2"],
-["30057270", "LUVA EMENDA CB COMPR AL 85,02MM2"],
-["30057277", "LUVA EMENDA CB COMPR AL ASTM1100 300M2"],
-["30057306", "LUVA ISOL I CL:1 BORR T:9 10KV"],
-["30057327", "LUVA ISOL II CL:0 BORR T: 8,5; 5KV"],
-["30057323", "LUVA ISOL II CL:0 BORR T:10 5KV"],
-["30057324", "LUVA ISOL II CL:0 BORR T:10,5 5KV"],
-["30057326", "LUVA ISOL II CL:0 BORR T:8 5KV"],
-["30057329", "LUVA ISOL II CL:0 BORR T:9 5KV"],
-["30057330", "LUVA ISOL II CL:0 BORR T:9,5 5KV"],
-["30057336", "LUVA ISOL II CL:1 BORR T:10 10KV"],
-["30057337", "LUVA ISOL II CL:1 BORR T:10,5 10KV"],
-["30057339", "LUVA ISOL II CL:1 BORR T:9 7,5KV"],
-["30057340", "LUVA ISOL II CL:1 BORR T:9,5 7,5KV"],
-["30057341", "LUVA ISOL II CL:2 BORR T:10 20KV"],
-["30057342", "LUVA ISOL II CL:2 BORR T:10,5 20KV"],
-["30057344", "LUVA ISOL II CL:2 BORR T:9 20KV"],
-["30057345", "LUVA ISOL II CL:2 BORR T:9,5 20KV"],
-["30057357", "LUVA ISOL II CL:4 BORR T:9,5 40KV"],
-["30057371", "LUVA POLIAMIDA COM BANHO NITRILICO T:10"],
-["30057406", "LUVA SEG ALGO SUEDINE T:10"],
-["30057410", "LUVA SEG PA"],
-["30057374", "LUVA SEG PA T:9"],
-["30057415", "LUVA SEG VAQ CZ T:M"],
-["30057411", "LUVA SEGURANCA NITRILICA T:10"],
-["30057413", "LUVA SEGURANCA VAQUETA T:G"],
-["30057416", "LUVA SEGURANCA VAQUETA T:P"],
-["30057430", "MACACAO PROT AGENT QUIM T:G"],
-["30057433", "MACACAO PROT AGENT QUIM T:XG"],
-["30057439", "MACACAO PROTEC CONTRA INSET T:G"],
-["30057440", "MACACAO PROTEC CONTRA INSET T:M APIC155"],
-["30057441", "MACACAO PROTEC CONTRA INSET T:XG"],
-["30057442", "MACACAO PROTEC CONTRA INSET T:XXG"],
-["30057482", "MANGA SEGUR TP:ISOL II CL:2 BORR LR"],
-["30057483", "MANGA SEGUR TP:ISOL II CL:2 BORR LR"],
-["30057505", "MANILHA SAP ACF FOFO NOD 5000DAN"],
-["30057517", "MANTA REPAR CAB AEREO 15KV"],
-["30057525", "MAO FRANCESA FERR CANT TP 1 AC"],
-["30057526", "MAO FRANCESA FERR CANT TP 2 AC"],
-["30057527", "MAO FRANCESA FERR CANT TP 3 AC"],
-["10053417", "MED EL 1EL 2F 120V 15A"],
-["10053420", "MED EL 2EL 3F 120V 15A"],
-["10053421", "MED EL 3EL 4F 120V 15A"],
-["10053412", "MED EL BWBT 3EL 4F 120/240V 15A"],
-["10053436", "MED EL MMGD 1EL 2F 120V 15A"],
-["10053438", "MED EL MMGD 2EL 3F 120V 15A"],
-["10053440", "MED EL MMGD 3EL 4F 120V 2,5A"],
-["10053443", "MED EL MULT PROG AR 3EL 4F 120V 30A"],
-["10053444", "MED EL MULT PROG AR 3EL 4F 280V 2,5A"],
-["10053430", "MED EL TB 3EL 4F 120/240V 2,5A"],
-["10053418", "MED ELETR 1EL 3F 240V 15A"],
-["10053517", "MED ELETR 3EL 4F 120V 15A"],
-["10053533", "MED ELETR 3EL 4F 240V 15A"],
-["10053425", "MED ELETR ATIV 3F 120V 15A 1PCT"],
-["10053424", "MED ELETR ATIV BIFASICO 120V 15A 1PCT"],
-["10053437", "MED ELETR MMGD 1EL 3F 240V 15A"],
-["10053439", "MED ELETR MMGD 3EL 4F 120V 15A"],
-["10053416", "MED ELETR MULTIF AR CME 3EL 4F 280V 2,5A"],
-["10053455", "MED ELETR TB ATIV 3F 120V 15A 1PCT"],
-["10053492", "MEDIDOR 15A"],
-["30057721", "MOCHILA EPI TEC 40L"],
-["10053422", "MOD ELETR 1EL 120V 15A"],
-["10053661", "MOD SGP M LANDIS E13 1EL 2F 120V 15A"],
-["10053662", "MOD SGP M LANDIS E13 2EL 3F 240V 15A"],
-["10053663", "MOD SGP M LANDIS E13 3EL 4F 120V 15A"],
-["10053748", "MODULO EL TELEMED RED CEL 1A"],
-["10053754", "MODULO ELETRON TELEMED RF C410-IR01 LAND"],
-["30057848", "MOSQUETAO MET 25KN"],
-["30057912", "OCULOS DE SEGURANCA SOBREPOR UVEX"],
-["30057913", "OCULOS SEG C/LED"],
-["30057914", "OCULOS SEG CINZA"],
-["30057911", "OCULOS SEG INC"],
-["30057926", "OCULOS SEG INCOLOR"],
-["30057931", "OCULOS SEG LENT UN FUME / CINZA"],
-["30057937", "OCULOS SEG SOBREP INCO 3M"],
-["30058097", "PARAF ESPAC M 16MM PAS:2 500MM AC 1020"],
-["30058099", "PARAF ESPAC M G 16MM PAS:2 400MM AC 1020"],
-["30058100", "PARAF ESPAC M G 16MM PAS:2 450MM AC 1020"],
-["30058103", "PARAF ESPAC M G 16MM PAS:2 550MM AC 1020"],
-["30058116", "PARAF FRANCES M G 16MM 150MM AC"],
-["30058120", "PARAF FRANCES M G 16MM 45MM AC"],
-["30058123", "PARAF FRANCES M G 16MM 70MM AC"],
-["30058226", "PARAFUSO CAB QUAD 16MM 125MM AC"],
-["30058234", "PARAFUSO CAB QUAD 16MM 250MM AC"],
-["30058235", "PARAFUSO CAB QUAD 16MM 300MM AC"],
-["30058243", "PARAFUSO CAB QUAD 16MM 450MM AC"],
-["30058249", "PARAFUSO CAB QUAD 16MM 50MM AC"],
-["30058334", "PARAFUSO QUADR ACO CARB M16 X 350 MM"],
-["30058669", "PELICULA REFLET AUTOADESIV LET A"],
-["30058670", "PELICULA REFLET AUTOADESIV LET B"],
-["30058671", "PELICULA REFLET AUTOADESIV LET C"],
-["30058672", "PELICULA REFLET AUTOADESIV LET D"],
-["30058673", "PELICULA REFLET AUTOADESIV LET E"],
-["30058674", "PELICULA REFLET AUTOADESIV LET F"],
-["30058675", "PELICULA REFLET AUTOADESIV LET I"],
-["30058677", "PELICULA REFLET AUTOADESIV LET L"],
-["30058681", "PELICULA REFLET AUTOADESIV LET Q"],
-["30058682", "PELICULA REFLET AUTOADESIV LET R"],
-["30058683", "PELICULA REFLET AUTOADESIV LET S"],
-["30058684", "PELICULA REFLET AUTOADESIV LET T"],
-["30058685", "PELICULA REFLET AUTOADESIV LET U"],
-["30058686", "PELICULA REFLET AUTOADESIV LET Z"],
-["30058694", "PELICULA REFLET AUTOADESIV N 1"],
-["30058695", "PELICULA REFLET AUTOADESIV N 2"],
-["30058696", "PELICULA REFLET AUTOADESIV N 3"],
-["30058697", "PELICULA REFLET AUTOADESIV N 4"],
-["30058698", "PELICULA REFLET AUTOADESIV N 5"],
-["30058699", "PELICULA REFLET AUTOADESIV N 6"],
-["30058700", "PELICULA REFLET AUTOADESIV N 7"],
-["30058701", "PELICULA REFLET AUTOADESIV N 8"],
-["30058702", "PELICULA REFLET AUTOADESIV NUM 0"],
-["30058750", "PERNEIRA DE SEGURANCA G"],
-["30058796", "PINO P/ISOL 15-35KV RSC 169MM AC"],
-["30058799", "PINO P/ISOL 15KV RSC M 294MM ACO CARB"],
-["30058801", "PINO P/ISOL 194MM AC"],
-["30058986", "PLACA SINAL NAO OPERE ESTE EQUIPAMENTO"],
-["30058988", "PLACA SINAL PVC P/PEDESTRE"],
-["30059052", "PORCA OLH AC 1020 16MM M"],
-["30059102", "PORTA FUSIVEL TIPO C CZ 15KV 100A"],
-["10054760", "POSTE CIRC SEC DUAS PART FIB 12M 600DAN"],
-["10054952", "POSTE FIBRA CIRCULAR 10M 600DAN 3P EMERG"],
-["30059227", "PROTETOR AUR CON"],
-["30059229", "PROTETOR AUR PLUG"],
-["30059233", "PROTETOR CRUZ CONTRA PASSAROS POLIM"],
-["30056759", "PROTETOR FAC C/VIS PC ES.DT.PDN.00294"],
-["30059240", "PROTETOR LAB FPS30"],
-["30059241", "PROTETOR NUC PESC OREL"],
-["30059243", "PROTETOR P/ TIRANTE DE 1/4"],
-["30059251", "PROTETOR SOLAR FPS 30 120G"],
-["10055195", "RADIO COM COMUNICACAO RF BLUET BAT"],
-["30059292", "RADIO COM CONCEN PRIM"],
-["30059293", "RADIO COMUNICACAO RF 915MHZ RS232"],
-["30059294", "RADIO DIG RF 902A928MHZ PINO 30027900"],
-["30059464", "REPELENTE FR 120ML"],
-["30059992", "SAPATILHA P/PREF AC 1020 54MM 75MM"],
-["30060010", "SELA AC 1010/20 CRUZ AC"],
-["30060011", "SELA AC 1010/20 CRUZ MAD CONCR"],
-["30060047", "SELO LACRACAO STC POLICARBONATO LARANJA"],
-["30060050", "SELO SEG SEMI BARR AC AZ 300MM"],
-["30060082", "SEPAR FAS 6A336,4AWG POLIM"],
-["30060132", "SINALIZ LUM PORTATIL NOTURNO"],
-["30060258", "SUP EQUIP I AC 1020 CIRC 255MM"],
-["30060260", "SUP EQUIP I AC 1020 CIRC 285MM"],
-["30060263", "SUP EQUIP III AC 1020 CIRC 255MM"],
-["30060267", "SUP INST AFAST HORIZONT AC"],
-["30062482", "SUP INST ESPICULAS PETG"],
-["30060303", "SUPORTE CONCENTRADOR SEC SMC"],
-["30060343", "SUPORTE FIX EXTENS CONS SEC SMC AC 1020"],
-["30060349", "SUPORTE FIX P/NUM REFL PC 440MM 95MM 4MM"],
-["30060354", "SUPORTE FIX T AC 1020"],
-["30060464", "TALABARTE DUPLO Y LEAL"],
-["30060469", "TALABARTE P/CINT LV CEST AEREA"],
-["30060475", "TALABARTE POS 2M LEAL"],
-["30060457", "TALABARTE POS 3M"],
-["30060614", "TERM MOD EX C/CONECTOR 35KV 400MM2"],
-["30060616", "TERM MOD EX C/CONECTOR 8,7-15KV 240MM2"],
-["30060682", "TERMINAL ELET BAND TP 1"],
-["30060683", "TERMINAL ELET BAND TP 2"],
-["30060684", "TERMINAL ELET BAND TP 3 4 FUR"],
-["30060728", "TERMINAL PINO BT ILH AM 25MM2"],
-["30060730", "TERMINAL PINO BT ILH AZ 16MM2"],
-["30060737", "TERMINAL PINO BT ILH VM 10MM2"],
-["30060738", "TERMINAL PINO BT ILH VM 35MM2"],
-["10057247", "TRAFO AER 1F 7,967KV 240/120V 25KVA GV"],
-["10057267", "TRAFO AER BC 7,96KV 127V 1,5KVA 1F"],
-["30061213", "TRAFO COR 0,6KV INT 200-5A"],
-["30061214", "TRAFO COR 0,6KV INT 400-5A"],
-["10057300", "TRAFO COR 13,8KV 10/5A 0,3C25 INT"],
-["10057316", "TRAFO COR 13,8KV 15/5A 0,3C25 INT"],
-["10057326", "TRAFO COR 13,8KV 5/5A 0,3C25 INT"],
-["10057327", "TRAFO COR 13,8KV 50/5A 0,3C25 INT"],
-["10057345", "TRAFO COR 13,8KV INT 200-5A"],
-["10057202", "TRAFO DIST 3F 15KV 220/127V 112,5KVA MV"],
-["10057205", "TRAFO DIST 3F 15KV 220/127V 150KVA MV"],
-["10057207", "TRAFO DIST 3F 15KV 220/127V 15KVA MV"],
-["10057214", "TRAFO DIST 3F 15KV 220/127V 30KVA MV"],
-["10057217", "TRAFO DIST 3F 15KV 220/127V 45KVA MV"],
-["30061258", "TRAVA QUEDAS LEAL"]
+      ["30050022", "ABRACADEIRA FLEX PT 950MM 8,8MM 250MM"],
+      ["30051093", "ABRACADEIRA ID GUARD TEC EL VELC VD"],
+      ["30050117", "AFASTADOR ARM SEC AC 1010/20 900MM"],
+      ["30050149", "ALCA PREF DISTR CA 336,4MCM"],
+      ["30050153", "ALCA PREF DISTR CA CAA 3/0AWG"],
+      ["30050155", "ALCA PREF DISTR CA CAA 4AWG"],
+      ["30050159", "ALCA PREF DISTR CABO PROT 15KV 185MM2"],
+      ["30050164", "ALCA PREF DISTR CORDOALHA AC 6,4MM"],
+      ["30050166", "ALCA PREF DISTR PROT 15KV 70MM2"],
+      ["30050172", "ALCA PREF SERV CABO MULT 70MM2"],
+      ["30050173", "ALCA PREF SERV CABO MULT NI 10A16MM2"],
+      ["30050290", "ANEL AMAR ESPACAD SEPARAD PEAD CZ"],
+      ["30050330", "ANILHA PVC NUMERO 6 9A12,6MM"],
+      ["30050331", "ANILHA PVC NUMERO CINCO 9A12,6MM"],
+      ["30050332", "ANILHA PVC NUMERO DOIS 9A12,6MM"],
+      ["30050333", "ANILHA PVC NUMERO NOVE 9A12,6MM"],
+      ["30050334", "ANILHA PVC NUMERO OITO 9A12,6MM"],
+      ["30050335", "ANILHA PVC NUMERO QUATRO 9A12,6MM"],
+      ["30050336", "ANILHA PVC NUMERO SETE 9A12,6MM"],
+      ["30050337", "ANILHA PVC NUMERO TRES 9A12,6MM"],
+      ["30050338", "ANILHA PVC NUMERO UM 9A12,6MM"],
+      ["30050339", "ANILHA PVC NUMERO ZERO 9A12,6MM"],
+      ["30050361", "APITO TP C/CORDAO GUARD"],
+      ["30050393", "ARMACAO P/ISOL SEC 1 ESTR DES: AMR-060"],
+      ["30050394", "ARMACAO P/ISOL SEC AC 1010 1020 2 ESTR"],
+      ["30050463", "ARRUELA LISA QUAD ACO CARB 18MM 3MM"],
+      ["30050515", "BANDEIRA SINAL S/CABO EDP"],
+      ["30050725", "BLINDAGEM COMPLETA SEC TRAFO DIST TRI"],
+      ["30050777", "BLOQUEADOR SOLAR FPS 30 FR 120G 68"],
+      ["30059253", "BLOQUEADOR SOLAR FPS 60 BIS 120G 70"],
+      ["30050947", "BOLSA TRANSP P/CAPACETE VISEIRA"],
+      ["30050945", "BOLSA TRANSP P/LUVA ISOL"],
+      ["30050951", "BOLSA TRANSP P/LV MAN ISL"],
+      ["30051100", "BRACO C AC 13,8KV"],
+      ["30051106", "BRACO L FOFO NOD 15KV"],
+      ["10050583", "CABO ANTIF AL 1X1X16MM2+16MM2 0,6-1KV"],
+      ["30051481", "CABO FLEX CU EL PVC 2C 2,5MM2 500V PT"],
+      ["30051554", "CABO ISOL PVC CU PVC PT 37C 120MM2 750V"],
+      ["10050547", "CABO MULT QDX NI AL XLPE 3X120+70MM2 1KV"],
+      ["10050549", "CABO MULT QDX NI AL XLPE 3X16+16MM2 1KV"],
+      ["10050551", "CABO MULT QDX NI AL XLPE 3X25+25MM2 1KV"],
+      ["10050553", "CABO MULT QDX NI AL XLPE 3X70+70MM2 1KV"],
+      ["10050544", "CABO MULT TPX NI AL XLPE 2X16+16MM2 1KV"],
+      ["10050866", "CABO NU AC AL 50,29MM2 3F 9,93MM"],
+      ["10051206", "CABO NU AL 4AWG SWAN"],
+      ["10050870", "CABO NU CA AL 1/0AWG 9,36MM 7F 3,12MM"],
+      ["10050875", "CABO NU CA AL 336,4MCM 19F TULIP"],
+      ["10050879", "CABO NU CA AL 84,91MM2 7F 3,93MM"],
+      ["10051202", "CABO NU CAA AL 1/0AWG RAVEN"],
+      ["10051016", "CABO POT CU EL EPR 1C 120MM2 1KV PT"],
+      ["10050570", "CABO PROT AL PE RET 1C 185MM2 15KV CZ"],
+      ["30051709", "CABO PROT CU 1C 16MM2 15KV CZ"],
+      ["10050572", "CABO PROT XLPE AL PE RET 1C 70MM2 15KV"],
+      ["30051751", "CABO WPP CU 50MM2 CZ"],
+      ["30054644", "CAIXA MED ENER P/TCS MEDIC 460MM 140MM"],
+      ["30054645", "CAIXA MED ENER S/ABER 300MM 200MM"],
+      ["30052378", "CAIXA ORGANIZADORA PP 130 L PRETO PITLOG"],
+      ["30051966", "CALCA SEG MOTOSSERRISTA T:G"],
+      ["30051967", "CALCA SEG MOTOSSERRISTA T:GG"],
+      ["30051968", "CALCA SEG MOTOSSERRISTA T:M"],
+      ["30051969", "CALCA SEG MOTOSSERRISTA T:P"],
+      ["30051943", "CALCA SEG OP ANTI T:EG"],
+      ["30051937", "CALCA SEG OP ANTI T:EGG"],
+      ["30051938", "CALCA SEG OP ANTI T:EGGG"],
+      ["30051940", "CALCA SEG OP ANTI T:GG"],
+      ["30051941", "CALCA SEG OP ANTI T:M"],
+      ["30051942", "CALCA SEG OP ANTI T:P"],
+      ["30051063", "CALCADO SEG BOTIN 38"],
+      ["30052046", "CALCADO SEG BOTIN 38"],
+      ["30051064", "CALCADO SEG BOTIN 39"],
+      ["30052047", "CALCADO SEG BOTIN 39"],
+      ["30052048", "CALCADO SEG BOTIN 40"],
+      ["30052050", "CALCADO SEG BOTIN 42"],
+      ["30052051", "CALCADO SEG BOTIN 43"],
+      ["30052052", "CALCADO SEG BOTIN 44"],
+      ["30052053", "CALCADO SEG BOTIN 45"],
+      ["30051052", "CALCADO SEG BOTIN CL ELET 38"],
+      ["30051053", "CALCADO SEG BOTIN CL ELET 39"],
+      ["30051054", "CALCADO SEG BOTIN CL ELET 40"],
+      ["30051055", "CALCADO SEG BOTIN CL ELET 41"],
+      ["30051058", "CALCADO SEG BOTIN CL ELET 44"],
+      ["30052062", "CALCADO SEG BOTIN ELETRIC 37"],
+      ["30052065", "CALCADO SEG BOTIN ELETRIC COUR CUR CR 36"],
+      ["30051067", "CALCADO SEG COT ELET 42"],
+      ["30051068", "CALCADO SEG COT ELET 43"],
+      ["30051069", "CALCADO SEG COT ELET 45"],
+      ["30052090", "CALCO AJUS AC 1020 138MM"],
+      ["30052244", "CAMISA OP ANT MASC G."],
+      ["30052237", "CAMISA OP ANTI FEM G"],
+      ["30052238", "CAMISA OP ANTI FEM GG"],
+      ["30052239", "CAMISA OP ANTI FEM M"],
+      ["30052240", "CAMISA OP ANTI FEM P"],
+      ["30052246", "CAMISA OP ANTI M"],
+      ["30052243", "CAMISA OP ANTI MASC EGG"],
+      ["30052247", "CAMISA OP ANTI P"],
+      ["30052245", "CAMISA OPERACIONAL ANTI CHAMA GG"],
+      ["30052248", "CAMISA OPERACIONAL ANTI CHAMA TAM XG"],
+      ["30052331", "CAMISETA ALG 100PCT G"],
+      ["30052330", "CAMISETA ALGO 100PCT CAR EGG"],
+      ["30052332", "CAMISETA ALGO 100PCT CAR GG"],
+      ["30052333", "CAMISETA ALGO 100PCT CAR M"],
+      ["30052334", "CAMISETA ALGO 100PCT CAR P"],
+      ["30052356", "CAMISETA MALH ANTI-CHAM G"],
+      ["30052357", "CAMISETA MALH ANTI-CHAM GG"],
+      ["30052358", "CAMISETA MALH ANTI-CHAM M"],
+      ["30052359", "CAMISETA MALH ANTI-CHAM P"],
+      ["30052360", "CAMISETA MALH ANTI-CHAM XG"],
+      ["30052558", "CANTONEIRA SUPORTE AUX RDC ACO CARB"],
+      ["30052624", "CAPACETE SEG C/ABA FRON LJ"],
+      ["30052623", "CAPACETE SEGURANCA C/ABA FRON BR"],
+      ["30052657", "CARNEIRA C/JUG CAP SEGURANCA STAN ON"],
+      ["30052658", "CARNEIRA C/JUG FAZ-TRAC CAP SEGURANCA"],
+      ["30052957", "CHAVE CALIBR 10P 600V CA 20A C/TOM"],
+      ["10051358", "CHAVE FUS RELIG 15KV 100A MANUAL"],
+      ["10051364", "CHAVE FUSIVEL 36,2KV 300A MANUAL"],
+      ["10051426", "CHAVE SEC BYP 15KV 630A MANUAL D-E"],
+      ["10051424", "CHAVE SEC BYP 15KV 630A MANUAL E-D"],
+      ["10051443", "CHAVE SEC FACA 15KV 630A POLIM"],
+      ["30053134", "CINTA POSTE AC ZC F 160MM B-16"],
+      ["30053136", "CINTA POSTE AC ZC F 180MM B-18"],
+      ["30053137", "CINTA POSTE AC ZC F 200MM B-20"],
+      ["30053138", "CINTA POSTE AC ZC F 220MM B-22"],
+      ["30053140", "CINTA POSTE AC ZC F 240MM B-24"],
+      ["30053141", "CINTA POSTE AC ZC F 260MM B-26"],
+      ["30053241", "CINTO P/CALCA PA"],
+      ["30053250", "CINTO SEG PARAQUEDISTA T2 LEAL"],
+      ["30053252", "CINTO SEGUR PARAQ LV CEST AEREA T:1"],
+      ["30053253", "CINTO SEGUR PARAQ LV CEST AEREA T:2"],
+      ["30053255", "CINTO SEGUR PRQ T:1 LEAL"],
+      ["30053274", "CJ EMENDA CABO CONCENTRICO XLPE"],
+      ["30053280", "CJ IMPERMEAVEL EXG"],
+      ["30053281", "CJ IMPERMEAVEL G"],
+      ["30053282", "CJ IMPERMEAVEL GG"],
+      ["30053283", "CJ IMPERMEAVEL M"],
+      ["30053284", "CJ IMPERMEAVEL P"],
+      ["30053317", "COBERTURA PROT ESTRIBO/GLV 15KV"],
+      ["30053319", "COBERTURA PROT PARA-RAIO 13,8KV"],
+      ["30053409", "COLETE SINAL C/REFL G"],
+      ["30053408", "COLETE SINAL EG"],
+      ["30053410", "COLETE SINAL GG"],
+      ["30053411", "COLETE SINAL M"],
+      ["30053432", "CON CNH RM III-IV-V CU 1,5A21,15MM2"],
+      ["30053435", "CON CUNHA RAMAL I CU 8,36A35MM2"],
+      ["30053436", "CON CUNHA RAMAL VII CU 21,15A70MM2"],
+      ["30053437", "CON CUNHA RD CN2 AL PROT CORR GAL"],
+      ["30053439", "CON CUNHA RD CN4 AL PROT CORR GAL"],
+      ["30053444", "CON CUNHA RD CN6 AL PROT CORR GAL"],
+      ["30053445", "CON CUNHA RD CN7 AL PROT CORR GAL"],
+      ["30054024", "CON TERM COMPR 240MM2"],
+      ["10051773", "CONCENTR PRIM ENERG 3F RED CEL LANDIS"],
+      ["10051778", "CONCENTR SEC ENERG 3F 120/240V"],
+      ["10051781", "CONCENTR SEC ENERG 3F RF"],
+      ["30053479", "CONE SINAL PVC 750MM C/FX REFL"],
+      ["30053521", "CONECT CUNH RAMAL TP II CU 13,3A35MM2"],
+      ["30053522", "CONECT CUNH RAMAL TP VI CU 33,63A70MM2"],
+      ["30053529", "CONECT ESTRAN TP 5 LG AL 95A120MM2"],
+      ["30053531", "CONECT ESTRAN TP 7 LG AL 185A240MM2"],
+      ["30053533", "CONECT ESTRANG TP 4 LG AL 62,44A70MM2"],
+      ["30053534", "CONECT LUV COMPRES AL"],
+      ["30053535", "CONECT LUV COMPRES CU ELETROL 27A27,2MM"],
+      ["30053933", "CONECTOR PERF ESP HIBR 4-4/0AWG"],
+      ["30053934", "CONECTOR PERF ESP HIBR 4-4/0AWG"],
+      ["30053937", "CONECTOR PERF FLEX 10-25MM2 16-25MM2"],
+      ["30053936", "CONECTOR PERF FLEX 10A16MM2 6A12MM2"],
+      ["30053938", "CONECTOR PERF FLEX 10A35MM2 25A35MM2"],
+      ["30053939", "CONECTOR PERF FLEX 25A70MM2 50A70MM2"],
+      ["30053940", "CONECTOR PERF FLEX 50A120MM2 185A240MM2"],
+      ["30053941", "CONECTOR PERF FLEX 95A120MM2 95A120MM2"],
+      ["30053944", "CONECTOR PERF RD 16-120MM2 4-35MM2"],
+      ["30053945", "CONECTOR PERF RD 16-95MM2 1,5-10MM2"],
+      ["30053946", "CONECTOR PERF RD 25-120MM2 25-120MM2"],
+      ["30054479", "CORDA SEG LINHA VIDA"],
+      ["30054529", "CPU CONCENTR SEC 80A300V 1A18V"],
+      ["30054528", "CPU CONCENTR SECUND 120V 15-100A 60HZ"],
+      ["30054577", "CRUZETA P/POSTE AC 1010/20 2M"],
+      ["30054579", "CRUZETA P/POSTE FB VD 2M 90MM 90MM"],
+      ["30054583", "CRUZETA P/POSTE FB VD 3,92M 90X90MM"],
+      ["30054636", "CX INTERLIG P/REDE CONCENTR"],
+      ["30054746", "DISJ MINI TM 63A 2P"],
+      ["30054777", "DISJUNTOR BT TERMOM BIP 50A 220/380VCA"],
+      ["30054779", "DISJUNTOR BT TERMOM BIP 70A 220/380VCA"],
+      ["30054792", "DISJUNTOR MINI 1P 50A 220V"],
+      ["30054793", "DISJUNTOR MINI 1P 63A 440V 250V"],
+      ["30054794", "DISJUNTOR MINI 1P 70A 440V"],
+      ["30054842", "DISPLAY TERMINAL LEITURA TLI LANDIS"],
+      ["30054942", "ELETRODUTO FLEX CORR AC 1POL"],
+      ["30055007", "ELO FUSIVEL H 1A 500MM"],
+      ["30055008", "ELO FUSIVEL H 2A 500MM"],
+      ["30055009", "ELO FUSIVEL H 3A 500MM"],
+      ["30055010", "ELO FUSIVEL H 5A 500MM"],
+      ["30055011", "ELO FUSIVEL K 10A 500MM"],
+      ["30055012", "ELO FUSIVEL K 12A 500MM"],
+      ["30055013", "ELO FUSIVEL K 15A 500MM"],
+      ["30055014", "ELO FUSIVEL K 20A 500MM"],
+      ["30055016", "ELO FUSIVEL K 25A 500MM"],
+      ["30055017", "ELO FUSIVEL K 30A 500MM"],
+      ["30055018", "ELO FUSIVEL K 40A 500MM"],
+      ["30055019", "ELO FUSIVEL K 50A 500MM"],
+      ["30055020", "ELO FUSIVEL K 65A 500MM"],
+      ["30055021", "ELO FUSIVEL K 6A 500MM"],
+      ["30055023", "ELO FUSIVEL K 8A 500MM"],
+      ["30055032", "EMENDA ELET AUT 14,73A18,39MM"],
+      ["30055034", "EMENDA ELET AUT 5,82A8,64MM"],
+      ["30055036", "EMENDA ELET AUT 9,27A12,07MM"],
+      ["30055078", "EMENDA TERMOCONT FR 8,7-15KV 240MM2"],
+      ["30055136", "ENVELOPE PE 400MM 484MM"],
+      ["30055224", "ESPACADOR AUT LOSANG 13,8KV"],
+      ["30055238", "ESPACADOR P/REDE AEREA SEC 1/0A336,4AWG"],
+      ["30055318", "ESTOJO P/OCULOS SEG"],
+      ["30055321", "ESTRIBO DERIV CU ESTANHADO E MP-07-02"],
+      ["30055741", "FIO AMARRACAO 4AWG AL"],
+      ["30055703", "FIO ISOL AL XPLE PT 1C 10MM2 600V"],
+      ["30055743", "FITA ANCOR SLI 1,2M"],
+      ["30055746", "FITA ANCOR TUB 1,2M"],
+      ["30055747", "FITA ANCOR TUB 1,5M"],
+      ["30055748", "FITA ANCOR TUB 600MM"],
+      ["30055749", "FITA ANCOR TUB 800MM"],
+      ["30055808", "FITA DEMARC REF SINAL CANT"],
+      ["30055806", "FITA DEMARC REF SINAL CANT C/CARRET"],
+      ["30055789", "FITA ISOL ADES PT 19MM RL 20M"],
+      ["30055854", "FONTE ALIMENT 90A240V 7,5W"],
+      ["30055937", "FORMULARIO COMUM NAO CONFORMID NUC 50X2V"],
+      ["30055940", "FORMULARIO CONFEC LIUC BT IND MT 50X2VIA"],
+      ["30055949", "FORMULARIO LEVANTAM CARGA INSTAL LEC50X2"],
+      ["30055954", "FORMULARIO TERMO OCORR INSP 210MM 297MM"],
+      ["30056018", "FREIO DESCENSOR EDDY AUTOBLOCANTE"],
+      ["30056131", "GANCHO SUST P/CAB ANT-FURT CONC 11,6MM"],
+      ["30056254", "GRAMPO P/ISOL T-1 AC 1020"],
+      ["30056366", "HASTE AT SIMPL AC 1020 COBR 5/8POL 2,4M"],
+      ["30056458", "ISOL ELET PILAR PORCEL 15KV 1000DAN"],
+      ["30056462", "ISOL ELET ROLD PORCEL VID"],
+      ["30056490", "ISOLADOR ELET PILAR AUTOTRAV POLIM 15KV"],
+      ["30056455", "ISOLADOR ELETR BAST POLIM 15KV"],
+      ["30056487", "ISOLADOR ELETR CAST PORCEL 25KV 600V"],
+      ["30056578", "JAQUETA OP ANTI EG 33"],
+      ["30056574", "JAQUETA OP ANTI G 33"],
+      ["30056575", "JAQUETA OP ANTI GG 33"],
+      ["30056576", "JAQUETA OP ANTI M 33"],
+      ["30056577", "JAQUETA OP ANTI P 33"],
+      ["30056637", "KIT ACESS PRESILHA ALCA"],
+      ["30056651", "KIT CHICOTE MED INDIRETA BT 1,8M"],
+      ["30056758", "KIT PROT FAC"],
+      ["30056767", "KIT REPARO CONE SINALIZACAO"],
+      ["30056851", "LACO PREF LAT DP CA CAA NU 1/0AWG"],
+      ["30056853", "LACO PREF LAT DP CA CAA NU 336,4MCM"],
+      ["30056856", "LACO PREF ROLD CA NU 1/0AWG"],
+      ["30056858", "LACO PREF ROLD CA NU 3/0AWG"],
+      ["30056859", "LACO PREF ROLD CA NU 336,4MCM"],
+      ["30056866", "LACO PREF TOPO CA CAA NU 336,4MCM"],
+      ["30056883", "LACRE PC AZ EDP 130MM"],
+      ["30060049", "LACRE PC VM"],
+      ["30056893", "LAMINA DESLIG LIGA CO BZ 15KV 300A 285MM"],
+      ["30057009", "LANTERNA CAB P/CAP ELAST"],
+      ["30057223", "LUVA COB LUVA ISOL COUR VAQ T:8"],
+      ["30057224", "LUVA COB LUVA ISOL COUR VAQ T:8,5"],
+      ["30057221", "LUVA COB LUVA ISOL T:10"],
+      ["30057222", "LUVA COB LUVA ISOL T:10,5"],
+      ["30057225", "LUVA COB LUVA ISOL T:9"],
+      ["30057226", "LUVA COB LUVA ISOL T:9,5"],
+      ["30057271", "LUVA EMENDA CABO COMPR LG AL ASTM 1100 1"],
+      ["30057279", "LUVA EMENDA CB COMPR AL 21,15MM2"],
+      ["30057280", "LUVA EMENDA CB COMPR AL 53,47MM2"],
+      ["30057270", "LUVA EMENDA CB COMPR AL 85,02MM2"],
+      ["30057277", "LUVA EMENDA CB COMPR AL ASTM1100 300M2"],
+      ["30057306", "LUVA ISOL I CL:1 BORR T:9 10KV"],
+      ["30057327", "LUVA ISOL II CL:0 BORR T: 8,5; 5KV"],
+      ["30057323", "LUVA ISOL II CL:0 BORR T:10 5KV"],
+      ["30057324", "LUVA ISOL II CL:0 BORR T:10,5 5KV"],
+      ["30057326", "LUVA ISOL II CL:0 BORR T:8 5KV"],
+      ["30057329", "LUVA ISOL II CL:0 BORR T:9 5KV"],
+      ["30057330", "LUVA ISOL II CL:0 BORR T:9,5 5KV"],
+      ["30057336", "LUVA ISOL II CL:1 BORR T:10 10KV"],
+      ["30057337", "LUVA ISOL II CL:1 BORR T:10,5 10KV"],
+      ["30057339", "LUVA ISOL II CL:1 BORR T:9 7,5KV"],
+      ["30057340", "LUVA ISOL II CL:1 BORR T:9,5 7,5KV"],
+      ["30057341", "LUVA ISOL II CL:2 BORR T:10 20KV"],
+      ["30057342", "LUVA ISOL II CL:2 BORR T:10,5 20KV"],
+      ["30057344", "LUVA ISOL II CL:2 BORR T:9 20KV"],
+      ["30057345", "LUVA ISOL II CL:2 BORR T:9,5 20KV"],
+      ["30057357", "LUVA ISOL II CL:4 BORR T:9,5 40KV"],
+      ["30057371", "LUVA POLIAMIDA COM BANHO NITRILICO T:10"],
+      ["30057406", "LUVA SEG ALGO SUEDINE T:10"],
+      ["30057410", "LUVA SEG PA"],
+      ["30057374", "LUVA SEG PA T:9"],
+      ["30057415", "LUVA SEG VAQ CZ T:M"],
+      ["30057411", "LUVA SEGURANCA NITRILICA T:10"],
+      ["30057413", "LUVA SEGURANCA VAQUETA T:G"],
+      ["30057416", "LUVA SEGURANCA VAQUETA T:P"],
+      ["30057430", "MACACAO PROT AGENT QUIM T:G"],
+      ["30057433", "MACACAO PROT AGENT QUIM T:XG"],
+      ["30057439", "MACACAO PROTEC CONTRA INSET T:G"],
+      ["30057440", "MACACAO PROTEC CONTRA INSET T:M APIC155"],
+      ["30057441", "MACACAO PROTEC CONTRA INSET T:XG"],
+      ["30057442", "MACACAO PROTEC CONTRA INSET T:XXG"],
+      ["30057482", "MANGA SEGUR TP:ISOL II CL:2 BORR LR"],
+      ["30057483", "MANGA SEGUR TP:ISOL II CL:2 BORR LR"],
+      ["30057505", "MANILHA SAP ACF FOFO NOD 5000DAN"],
+      ["30057517", "MANTA REPAR CAB AEREO 15KV"],
+      ["30057525", "MAO FRANCESA FERR CANT TP 1 AC"],
+      ["30057526", "MAO FRANCESA FERR CANT TP 2 AC"],
+      ["30057527", "MAO FRANCESA FERR CANT TP 3 AC"],
+      ["10053417", "MED EL 1EL 2F 120V 15A"],
+      ["10053420", "MED EL 2EL 3F 120V 15A"],
+      ["10053421", "MED EL 3EL 4F 120V 15A"],
+      ["10053412", "MED EL BWBT 3EL 4F 120/240V 15A"],
+      ["10053436", "MED EL MMGD 1EL 2F 120V 15A"],
+      ["10053438", "MED EL MMGD 2EL 3F 120V 15A"],
+      ["10053440", "MED EL MMGD 3EL 4F 120V 2,5A"],
+      ["10053443", "MED EL MULT PROG AR 3EL 4F 120V 30A"],
+      ["10053444", "MED EL MULT PROG AR 3EL 4F 280V 2,5A"],
+      ["10053430", "MED EL TB 3EL 4F 120/240V 2,5A"],
+      ["10053418", "MED ELETR 1EL 3F 240V 15A"],
+      ["10053517", "MED ELETR 3EL 4F 120V 15A"],
+      ["10053533", "MED ELETR 3EL 4F 240V 15A"],
+      ["10053425", "MED ELETR ATIV 3F 120V 15A 1PCT"],
+      ["10053424", "MED ELETR ATIV BIFASICO 120V 15A 1PCT"],
+      ["10053437", "MED ELETR MMGD 1EL 3F 240V 15A"],
+      ["10053439", "MED ELETR MMGD 3EL 4F 120V 15A"],
+      ["10053416", "MED ELETR MULTIF AR CME 3EL 4F 280V 2,5A"],
+      ["10053455", "MED ELETR TB ATIV 3F 120V 15A 1PCT"],
+      ["10053492", "MEDIDOR 15A"],
+      ["30057721", "MOCHILA EPI TEC 40L"],
+      ["10053422", "MOD ELETR 1EL 120V 15A"],
+      ["10053661", "MOD SGP M LANDIS E13 1EL 2F 120V 15A"],
+      ["10053662", "MOD SGP M LANDIS E13 2EL 3F 240V 15A"],
+      ["10053663", "MOD SGP M LANDIS E13 3EL 4F 120V 15A"],
+      ["10053748", "MODULO EL TELEMED RED CEL 1A"],
+      ["10053754", "MODULO ELETRON TELEMED RF C410-IR01 LAND"],
+      ["30057848", "MOSQUETAO MET 25KN"],
+      ["30057912", "OCULOS DE SEGURANCA SOBREPOR UVEX"],
+      ["30057913", "OCULOS SEG C/LED"],
+      ["30057914", "OCULOS SEG CINZA"],
+      ["30057911", "OCULOS SEG INC"],
+      ["30057926", "OCULOS SEG INCOLOR"],
+      ["30057931", "OCULOS SEG LENT UN FUME / CINZA"],
+      ["30057937", "OCULOS SEG SOBREP INCO 3M"],
+      ["30058097", "PARAF ESPAC M 16MM PAS:2 500MM AC 1020"],
+      ["30058099", "PARAF ESPAC M G 16MM PAS:2 400MM AC 1020"],
+      ["30058100", "PARAF ESPAC M G 16MM PAS:2 450MM AC 1020"],
+      ["30058103", "PARAF ESPAC M G 16MM PAS:2 550MM AC 1020"],
+      ["30058116", "PARAF FRANCES M G 16MM 150MM AC"],
+      ["30058120", "PARAF FRANCES M G 16MM 45MM AC"],
+      ["30058123", "PARAF FRANCES M G 16MM 70MM AC"],
+      ["30058226", "PARAFUSO CAB QUAD 16MM 125MM AC"],
+      ["30058234", "PARAFUSO CAB QUAD 16MM 250MM AC"],
+      ["30058235", "PARAFUSO CAB QUAD 16MM 300MM AC"],
+      ["30058243", "PARAFUSO CAB QUAD 16MM 450MM AC"],
+      ["30058249", "PARAFUSO CAB QUAD 16MM 50MM AC"],
+      ["30058334", "PARAFUSO QUADR ACO CARB M16 X 350 MM"],
+      ["30058669", "PELICULA REFLET AUTOADESIV LET A"],
+      ["30058670", "PELICULA REFLET AUTOADESIV LET B"],
+      ["30058671", "PELICULA REFLET AUTOADESIV LET C"],
+      ["30058672", "PELICULA REFLET AUTOADESIV LET D"],
+      ["30058673", "PELICULA REFLET AUTOADESIV LET E"],
+      ["30058674", "PELICULA REFLET AUTOADESIV LET F"],
+      ["30058675", "PELICULA REFLET AUTOADESIV LET I"],
+      ["30058677", "PELICULA REFLET AUTOADESIV LET L"],
+      ["30058681", "PELICULA REFLET AUTOADESIV LET Q"],
+      ["30058682", "PELICULA REFLET AUTOADESIV LET R"],
+      ["30058683", "PELICULA REFLET AUTOADESIV LET S"],
+      ["30058684", "PELICULA REFLET AUTOADESIV LET T"],
+      ["30058685", "PELICULA REFLET AUTOADESIV LET U"],
+      ["30058686", "PELICULA REFLET AUTOADESIV LET Z"],
+      ["30058694", "PELICULA REFLET AUTOADESIV N 1"],
+      ["30058695", "PELICULA REFLET AUTOADESIV N 2"],
+      ["30058696", "PELICULA REFLET AUTOADESIV N 3"],
+      ["30058697", "PELICULA REFLET AUTOADESIV N 4"],
+      ["30058698", "PELICULA REFLET AUTOADESIV N 5"],
+      ["30058699", "PELICULA REFLET AUTOADESIV N 6"],
+      ["30058700", "PELICULA REFLET AUTOADESIV N 7"],
+      ["30058701", "PELICULA REFLET AUTOADESIV N 8"],
+      ["30058702", "PELICULA REFLET AUTOADESIV NUM 0"],
+      ["30058750", "PERNEIRA DE SEGURANCA G"],
+      ["30058796", "PINO P/ISOL 15-35KV RSC 169MM AC"],
+      ["30058799", "PINO P/ISOL 15KV RSC M 294MM ACO CARB"],
+      ["30058801", "PINO P/ISOL 194MM AC"],
+      ["30058986", "PLACA SINAL NAO OPERE ESTE EQUIPAMENTO"],
+      ["30058988", "PLACA SINAL PVC P/PEDESTRE"],
+      ["30059052", "PORCA OLH AC 1020 16MM M"],
+      ["30059102", "PORTA FUSIVEL TIPO C CZ 15KV 100A"],
+      ["10054760", "POSTE CIRC SEC DUAS PART FIB 12M 600DAN"],
+      ["10054952", "POSTE FIBRA CIRCULAR 10M 600DAN 3P EMERG"],
+      ["30059227", "PROTETOR AUR CON"],
+      ["30059229", "PROTETOR AUR PLUG"],
+      ["30059233", "PROTETOR CRUZ CONTRA PASSAROS POLIM"],
+      ["30056759", "PROTETOR FAC C/VIS PC ES.DT.PDN.00294"],
+      ["30059240", "PROTETOR LAB FPS30"],
+      ["30059241", "PROTETOR NUC PESC OREL"],
+      ["30059243", "PROTETOR P/ TIRANTE DE 1/4"],
+      ["30059251", "PROTETOR SOLAR FPS 30 120G"],
+      ["10055195", "RADIO COM COMUNICACAO RF BLUET BAT"],
+      ["30059292", "RADIO COM CONCEN PRIM"],
+      ["30059293", "RADIO COMUNICACAO RF 915MHZ RS232"],
+      ["30059294", "RADIO DIG RF 902A928MHZ PINO 30027900"],
+      ["30059464", "REPELENTE FR 120ML"],
+      ["30059992", "SAPATILHA P/PREF AC 1020 54MM 75MM"],
+      ["30060010", "SELA AC 1010/20 CRUZ AC"],
+      ["30060011", "SELA AC 1010/20 CRUZ MAD CONCR"],
+      ["30060047", "SELO LACRACAO STC POLICARBONATO LARANJA"],
+      ["30060050", "SELO SEG SEMI BARR AC AZ 300MM"],
+      ["30060082", "SEPAR FAS 6A336,4AWG POLIM"],
+      ["30060132", "SINALIZ LUM PORTATIL NOTURNO"],
+      ["30060258", "SUP EQUIP I AC 1020 CIRC 255MM"],
+      ["30060260", "SUP EQUIP I AC 1020 CIRC 285MM"],
+      ["30060263", "SUP EQUIP III AC 1020 CIRC 255MM"],
+      ["30060267", "SUP INST AFAST HORIZONT AC"],
+      ["30062482", "SUP INST ESPICULAS PETG"],
+      ["30060303", "SUPORTE CONCENTRADOR SEC SMC"],
+      ["30060343", "SUPORTE FIX EXTENS CONS SEC SMC AC 1020"],
+      ["30060349", "SUPORTE FIX P/NUM REFL PC 440MM 95MM 4MM"],
+      ["30060354", "SUPORTE FIX T AC 1020"],
+      ["30060464", "TALABARTE DUPLO Y LEAL"],
+      ["30060469", "TALABARTE P/CINT LV CEST AEREA"],
+      ["30060475", "TALABARTE POS 2M LEAL"],
+      ["30060457", "TALABARTE POS 3M"],
+      ["30060614", "TERM MOD EX C/CONECTOR 35KV 400MM2"],
+      ["30060616", "TERM MOD EX C/CONECTOR 8,7-15KV 240MM2"],
+      ["30060682", "TERMINAL ELET BAND TP 1"],
+      ["30060683", "TERMINAL ELET BAND TP 2"],
+      ["30060684", "TERMINAL ELET BAND TP 3 4 FUR"],
+      ["30060728", "TERMINAL PINO BT ILH AM 25MM2"],
+      ["30060730", "TERMINAL PINO BT ILH AZ 16MM2"],
+      ["30060737", "TERMINAL PINO BT ILH VM 10MM2"],
+      ["30060738", "TERMINAL PINO BT ILH VM 35MM2"],
+      ["10057247", "TRAFO AER 1F 7,967KV 240/120V 25KVA GV"],
+      ["10057267", "TRAFO AER BC 7,96KV 127V 1,5KVA 1F"],
+      ["30061213", "TRAFO COR 0,6KV INT 200-5A"],
+      ["30061214", "TRAFO COR 0,6KV INT 400-5A"],
+      ["10057300", "TRAFO COR 13,8KV 10/5A 0,3C25 INT"],
+      ["10057316", "TRAFO COR 13,8KV 15/5A 0,3C25 INT"],
+      ["10057326", "TRAFO COR 13,8KV 5/5A 0,3C25 INT"],
+      ["10057327", "TRAFO COR 13,8KV 50/5A 0,3C25 INT"],
+      ["10057345", "TRAFO COR 13,8KV INT 200-5A"],
+      ["10057202", "TRAFO DIST 3F 15KV 220/127V 112,5KVA MV"],
+      ["10057205", "TRAFO DIST 3F 15KV 220/127V 150KVA MV"],
+      ["10057207", "TRAFO DIST 3F 15KV 220/127V 15KVA MV"],
+      ["10057214", "TRAFO DIST 3F 15KV 220/127V 30KVA MV"],
+      ["10057217", "TRAFO DIST 3F 15KV 220/127V 45KVA MV"],
+      ["30061258", "TRAVA QUEDAS LEAL"]
     ];
 
-    const materials = rawData.map(([code, name], index) => ({
+    let items = rawData.map(([code, name], index) => ({
       id: index,
       code,
       name,
@@ -775,152 +707,353 @@
       selected: false
     }));
 
-    const materialsList = document.getElementById('materialsList');
+    let currentViewMode = 'grid';
+    let searchQuery = '';
+
+    // DOM References
+    const itemsContainer = document.getElementById('itemsContainer');
     const searchInput = document.getElementById('searchInput');
-    const selectedCountEl = document.getElementById('selectedCount');
-    const btnClear = document.getElementById('btnClear');
-    const btnCopyTrigger = document.getElementById('btnCopyTrigger');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalPreview = document.getElementById('modalPreview');
-    const btnConfirmCopy = document.getElementById('btnConfirmCopy');
-    const btnCancelCopy = document.getElementById('btnCancelCopy');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const viewGridBtn = document.getElementById('viewGridBtn');
+    const viewTableBtn = document.getElementById('viewTableBtn');
+    const selectedItemsList = document.getElementById('selectedItemsList');
+    const emptyCartState = document.getElementById('emptyCartState');
+    const selectedBadgeCount = document.getElementById('selectedBadgeCount');
+    const copyRequisitionBtn = document.getElementById('copyRequisitionBtn');
+    const unselectAllBtn = document.getElementById('unselectAllBtn');
+    const statTotalItems = document.getElementById('statTotalItems');
+    const statSelected = document.getElementById('statSelected');
 
-    function renderList() {
-      const query = searchInput.value.toLowerCase().trim();
-      materialsList.innerHTML = '';
+    // Modal References
+    const addItemModal = document.getElementById('addItemModal');
+    const openAddItemModalBtn = document.getElementById('openAddItemModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const addItemForm = document.getElementById('addItemForm');
 
-      materials.forEach(item => {
-        if (query && !item.code.toLowerCase().includes(query) && !item.name.toLowerCase().includes(query)) {
-          return;
-        }
+    function init() {
+      statTotalItems.textContent = items.length;
+      renderItems();
+      updateSidebar();
+      setupEventListeners();
+    }
 
-        const el = document.createElement('div');
-        el.className = `material-item ${item.selected ? 'selected' : ''}`;
-        el.dataset.id = item.id;
+    function getFilteredItems() {
+      return items.filter(item => {
+        return !searchQuery || 
+          item.code.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+    }
 
-        el.innerHTML = `
-          <div class="code">${item.code}</div>
-          <div class="name">${item.name}</div>
-          <div class="qty-control" onclick="event.stopPropagation();">
-            <button class="btn-qty btn-minus" data-id="${item.id}">-</button>
-            <input type="number" class="qty-input" data-id="${item.id}" value="${item.quantity}" min="1">
-            <button class="btn-qty btn-plus" data-id="${item.id}">+</button>
+    function renderItems() {
+      const filtered = getFilteredItems();
+
+      if (filtered.length === 0) {
+        itemsContainer.className = 'w-full';
+        itemsContainer.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-center p-6 text-slate-400 border border-dashed border-[#1c3c44] rounded-2xl">
+            <i class="fa-solid fa-magnifying-glass text-3xl mb-3 text-slate-500"></i>
+            <p class="text-sm font-medium text-slate-200">Nenhum item encontrado</p>
+            <p class="text-xs text-slate-400 mt-1">Tente pesquisar por outros termos ou crie um novo material.</p>
           </div>
         `;
-
-        // Eventos de Clique / Seleção
-        let pressTimer = null;
-
-        const startPress = () => {
-          pressTimer = setTimeout(() => {
-            toggleSelect(item.id);
-            pressTimer = null;
-          }, 900);
-        };
-
-        const cancelPress = () => {
-          if (pressTimer) {
-            clearTimeout(pressTimer);
-            pressTimer = null;
-          }
-        };
-
-        el.addEventListener('mousedown', startPress);
-        el.addEventListener('mouseup', cancelPress);
-        el.addEventListener('mouseleave', cancelPress);
-        el.addEventListener('touchstart', startPress, { passive: true });
-        el.addEventListener('touchend', cancelPress);
-
-        el.addEventListener('click', () => {
-          if (!pressTimer) {
-            toggleSelect(item.id);
-          }
-        });
-
-        materialsList.appendChild(el);
-      });
-
-      // Event Listeners dos botões de quantidade
-      document.querySelectorAll('.btn-minus').forEach(b => {
-        b.addEventListener('click', (e) => {
-          const id = e.target.dataset.id;
-          if (materials[id].quantity > 1) {
-            materials[id].quantity--;
-            renderList();
-          }
-        });
-      });
-
-      document.querySelectorAll('.btn-plus').forEach(b => {
-        b.addEventListener('click', (e) => {
-          const id = e.target.dataset.id;
-          materials[id].quantity++;
-          renderList();
-        });
-      });
-
-      document.querySelectorAll('.qty-input').forEach(inp => {
-        inp.addEventListener('change', (e) => {
-          const id = e.target.dataset.id;
-          const val = parseInt(e.target.value) || 1;
-          materials[id].quantity = val < 1 ? 1 : val;
-          renderList();
-        });
-      });
-
-      updateCounter();
-    }
-
-    function toggleSelect(id) {
-      materials[id].selected = !materials[id].selected;
-      renderList();
-    }
-
-    function updateCounter() {
-      const count = materials.filter(i => i.selected).length;
-      selectedCountEl.textContent = count;
-    }
-
-    btnClear.addEventListener('click', () => {
-      materials.forEach(i => i.selected = false);
-      renderList();
-    });
-
-    // Formata o texto APENAS com Código e QTD para ser copiado
-    function getFormattedSelection() {
-      const selected = materials.filter(i => i.selected);
-      if (selected.length === 0) return '';
-      return selected.map(i => `${i.code}\tQTD ${i.quantity}`).join('\n');
-    }
-
-    btnCopyTrigger.addEventListener('click', () => {
-      const text = getFormattedSelection();
-      if (!text) {
-        alert('Nenhum item selecionado!');
         return;
       }
-      modalPreview.textContent = text;
-      modalOverlay.classList.add('active');
-    });
 
-    btnCancelCopy.addEventListener('click', () => {
-      modalOverlay.classList.remove('active');
-    });
+      if (currentViewMode === 'grid') {
+        renderGridView(filtered);
+      } else {
+        renderTableView(filtered);
+      }
+    }
 
-    btnConfirmCopy.addEventListener('click', () => {
-      const text = getFormattedSelection();
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copiado para a área de transferência com sucesso!');
-        modalOverlay.classList.remove('active');
-      }).catch(err => {
-        alert('Erro ao copiar. Verifique as permissões do seu navegador.');
+    function renderGridView(filtered) {
+      itemsContainer.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4';
+      itemsContainer.innerHTML = filtered.map(item => {
+        const isSelected = item.selected;
+        
+        return `
+          <div data-id="${item.id}" class="custom-card rounded-xl p-4 transition-all flex flex-col justify-between gap-4 cursor-pointer hover:border-slate-600 ${isSelected ? 'neon-border-green' : ''}" onclick="toggleSelectItem(${item.id})">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-bold text-neon-green bg-[#193339] border border-neon-green/30 px-2 py-0.5 rounded">
+                  ${item.code}
+                </span>
+                <span class="text-[10px] text-slate-400 font-mono">#${item.id + 1}</span>
+              </div>
+
+              <h3 class="text-sm font-medium text-white transition-colors leading-snug">
+                ${item.name}
+              </h3>
+            </div>
+
+            <div class="pt-3 border-t border-[#1c3c44] flex items-center justify-between gap-3" onclick="event.stopPropagation();">
+              <div class="flex items-center gap-1 custom-item-bg border border-[#1c3c44] rounded-lg p-1">
+                <button onclick="updateQty(${item.id}, -1)" class="w-7 h-7 rounded bg-[#132a30] hover:bg-[#0f2228] text-white font-bold text-sm flex items-center justify-center">
+                  <i class="fa-solid fa-minus text-[10px]"></i>
+                </button>
+                <input type="number" min="1" value="${item.quantity}" onchange="setQty(${item.id}, this.value)"
+                  class="w-10 text-center font-mono text-xs font-bold bg-transparent text-neon-green outline-none">
+                <button onclick="updateQty(${item.id}, 1)" class="w-7 h-7 rounded bg-[#132a30] hover:bg-[#0f2228] text-white font-bold text-sm flex items-center justify-center">
+                  <i class="fa-solid fa-plus text-[10px]"></i>
+                </button>
+              </div>
+
+              <button onclick="toggleSelectItem(${item.id})" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${isSelected ? 'bg-neon-green text-[#0f2228] hover:brightness-110' : 'bg-[#193339] text-slate-200 hover:text-white'}">
+                <i class="fa-solid ${isSelected ? 'fa-check' : 'fa-plus'}"></i>
+                <span>${isSelected ? 'SELECIONADO' : 'SELECIONAR'}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTableView(filtered) {
+      itemsContainer.className = 'w-full custom-card rounded-xl overflow-hidden';
+      itemsContainer.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-[#0f2228] border-b border-[#1c3c44] text-slate-300 uppercase tracking-wider">
+                <th class="p-3 w-12 text-center">Sel</th>
+                <th class="p-3 w-32">Código</th>
+                <th class="p-3">Descrição do Material</th>
+                <th class="p-3 w-36 text-center">Quantidade</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#1c3c44]">
+              ${filtered.map(item => {
+                const isSelected = item.selected;
+                return `
+                  <tr onclick="toggleSelectItem(${item.id})" class="cursor-pointer hover:bg-[#193339] transition-colors ${isSelected ? 'bg-[#00ff66]/10' : ''}">
+                    <td class="p-3 text-center" onclick="event.stopPropagation();">
+                      <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectItem(${item.id})"
+                        class="w-4 h-4 rounded border-[#1c3c44] bg-[#0f2228] text-neon-green focus:ring-neon-green cursor-pointer">
+                    </td>
+                    <td class="p-3 font-mono font-bold text-neon-green">${item.code}</td>
+                    <td class="p-3 font-medium text-white">${item.name}</td>
+                    <td class="p-3 text-center" onclick="event.stopPropagation();">
+                      <div class="inline-flex items-center gap-1 custom-item-bg border border-[#1c3c44] rounded-lg p-0.5">
+                        <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-[#132a30] hover:bg-[#0f2228] text-white font-bold text-xs flex items-center justify-center">
+                          -
+                        </button>
+                        <input type="number" min="1" value="${item.quantity}" onchange="setQty(${item.id}, this.value)"
+                          class="w-8 text-center font-mono text-xs font-bold bg-transparent text-neon-green outline-none">
+                        <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded bg-[#132a30] hover:bg-[#0f2228] text-white font-bold text-xs flex items-center justify-center">
+                          +
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function updateSidebar() {
+      const selected = items.filter(i => i.selected);
+      const count = selected.length;
+
+      statSelected.textContent = count;
+      selectedBadgeCount.textContent = `${count} selecionado(s)`;
+      document.getElementById('mobileBadge').textContent = count;
+      document.getElementById('mobileBadge').classList.toggle('hidden', count === 0);
+
+      if (count === 0) {
+        emptyCartState.style.display = 'flex';
+        selectedItemsList.innerHTML = '';
+        selectedItemsList.appendChild(emptyCartState);
+
+        copyRequisitionBtn.disabled = true;
+        copyRequisitionBtn.className = "w-full py-3 px-4 rounded-xl font-bold text-sm bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700 flex items-center justify-center gap-2 transition-all";
+        return;
+      }
+
+      emptyCartState.style.display = 'none';
+
+      selectedItemsList.innerHTML = selected.map(item => `
+        <div class="custom-item-bg border border-[#1c3c44] rounded-lg p-3 transition-all flex flex-col gap-2">
+          <div class="flex items-start justify-between gap-2">
+            <span class="font-mono text-xs font-bold text-neon-green bg-[#0f2228] border border-neon-green/30 px-1.5 py-0.5 rounded shrink-0">
+              ${item.code}
+            </span>
+            <button onclick="toggleSelectItem(${item.id})" class="text-slate-400 hover:text-red-400 text-xs transition-colors p-0.5">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <p class="text-xs text-white line-clamp-2 leading-relaxed">
+            ${item.name}
+          </p>
+
+          <div class="flex items-center justify-between pt-1 text-xs">
+            <span class="text-slate-400">QTD Solicitada:</span>
+            <div class="flex items-center gap-1 bg-[#0f2228] border border-[#1c3c44] rounded p-0.5">
+              <button onclick="updateQty(${item.id}, -1)" class="w-5 h-5 rounded hover:bg-[#132a30] text-white flex items-center justify-center">
+                -
+              </button>
+              <span class="font-mono font-bold text-neon-green w-6 text-center">${item.quantity}</span>
+              <button onclick="updateQty(${item.id}, 1)" class="w-5 h-5 rounded hover:bg-[#132a30] text-white flex items-center justify-center">
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      copyRequisitionBtn.disabled = false;
+      copyRequisitionBtn.className = "w-full py-3 px-4 rounded-xl font-bold text-sm bg-neon-green text-[#0f2228] hover:brightness-110 cursor-pointer shadow-lg flex items-center justify-center gap-2 transition-all";
+    }
+
+    window.toggleSelectItem = function(id) {
+      items[id].selected = !items[id].selected;
+      renderItems();
+      updateSidebar();
+    };
+
+    window.updateQty = function(id, delta) {
+      if (items[id].quantity + delta >= 1) {
+        items[id].quantity += delta;
+        renderItems();
+        updateSidebar();
+      }
+    };
+
+    window.setQty = function(id, val) {
+      const parsed = parseInt(val) || 1;
+      items[id].quantity = Math.max(1, parsed);
+      renderItems();
+      updateSidebar();
+    };
+
+    function formatRequisitionForClipboard() {
+      const selected = items.filter(i => i.selected);
+      return selected.map(item => `${item.code} QTD ${item.quantity}`).join('\n');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = message;
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function setupEventListeners() {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.trim();
+        clearSearchBtn.classList.toggle('hidden', !searchQuery);
+        renderItems();
       });
-    });
 
-    searchInput.addEventListener('input', renderList);
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        clearSearchBtn.classList.add('hidden');
+        renderItems();
+      });
 
-    // Inicialização
-    renderList();
+      viewGridBtn.addEventListener('click', () => {
+        currentViewMode = 'grid';
+        viewGridBtn.className = "px-3 py-1.5 rounded text-xs font-medium transition-all bg-[#00ff66]/20 text-neon-green border border-neon-green/30 flex items-center gap-1.5";
+        viewTableBtn.className = "px-3 py-1.5 rounded text-xs font-medium transition-all text-slate-300 hover:text-white flex items-center gap-1.5";
+        renderItems();
+      });
+
+      viewTableBtn.addEventListener('click', () => {
+        currentViewMode = 'table';
+        viewTableBtn.className = "px-3 py-1.5 rounded text-xs font-medium transition-all bg-[#00ff66]/20 text-neon-green border border-neon-green/30 flex items-center gap-1.5";
+        viewGridBtn.className = "px-3 py-1.5 rounded text-xs font-medium transition-all text-slate-300 hover:text-white flex items-center gap-1.5";
+        renderItems();
+      });
+
+      unselectAllBtn.addEventListener('click', () => {
+        items.forEach(i => i.selected = false);
+        renderItems();
+        updateSidebar();
+        showToast("Seleção limpada!");
+      });
+
+      copyRequisitionBtn.addEventListener('click', () => {
+        const textToCopy = formatRequisitionForClipboard();
+        if (!textToCopy) return;
+
+        const copySuccess = () => {
+          showToast(`${items.filter(i => i.selected).length} item(ns) copiados!`);
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(textToCopy).then(copySuccess);
+        } else {
+          const textArea = document.createElement("textarea");
+          textArea.value = textToCopy;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          copySuccess();
+        }
+      });
+
+      // Mobile Drawer logic
+      const sidebarPanel = document.getElementById('sidebarPanel');
+      document.getElementById('toggleMobileCartBtn').addEventListener('click', () => {
+        sidebarPanel.classList.remove('translate-x-full');
+      });
+
+      document.getElementById('closeMobileCartBtn').addEventListener('click', () => {
+        sidebarPanel.classList.add('translate-x-full');
+      });
+
+      // Modal handlers
+      openAddItemModalBtn.addEventListener('click', () => {
+        addItemModal.classList.remove('hidden');
+      });
+
+      const closeModal = () => {
+        addItemModal.classList.add('hidden');
+        addItemForm.reset();
+      };
+
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelModalBtn.addEventListener('click', closeModal);
+
+      addItemForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const code = document.getElementById('newCodeInput').value.trim();
+        const name = document.getElementById('newNameInput').value.trim();
+        const quantity = parseInt(document.getElementById('newQtyInput').value) || 1;
+
+        if (code && name) {
+          const newItem = {
+            id: items.length,
+            code,
+            name,
+            quantity,
+            selected: true
+          };
+          items.unshift(newItem);
+          statTotalItems.textContent = items.length;
+          renderItems();
+          updateSidebar();
+          closeModal();
+          showToast("Novo material adicionado!");
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
